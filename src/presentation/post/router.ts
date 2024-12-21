@@ -1,20 +1,13 @@
 import { Router } from "express";
+import { PostController } from "./controller";
 
 export class PostRoutes {
   static get routes(): Router {
     const router = Router();
+    const postController = new PostController();
 
-    router.get("/saludar", (req, res) => {
-      return res.status(200).json({
-        message: "Hola chicos!!!",
-      });
-    });
-
-    router.get("/dar-descanso", (req, res) => {
-      return res.status(200).json({
-        message: "Los engañe hoy no hay otro descanso jaja! sin tomates",
-      });
-    });
+    router.get("/", postController.findAllPost);
+    router.post("/", postController.createPost);
 
     return router;
   }
