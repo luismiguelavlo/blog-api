@@ -7,10 +7,10 @@ export class PostController {
   createPost = async (req: Request, res: Response) => {
     this.postService
       .createPost()
-      .then((data) => {
+      .then((data: any) => {
         return res.status(201).json(data);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         return res.status(500).json({
           message: "Creando Post",
           error,
