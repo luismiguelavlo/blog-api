@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { envs } from "./config";
 import { PostgresDatabase } from "./data";
 import { AppRoutes } from "./presentation/routes";

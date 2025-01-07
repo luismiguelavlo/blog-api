@@ -6,13 +6,13 @@ export class PostController {
 
   createPost = async (req: Request, res: Response) => {
     this.postService
-      .createPost()
+      .createPost(req.body)
       .then((data: any) => {
         return res.status(201).json(data);
       })
       .catch((error: any) => {
         return res.status(500).json({
-          message: "Creando Post",
+          message: "Internal Server Error",
           error,
         });
       });
@@ -26,6 +26,22 @@ export class PostController {
       })
       .catch((error) => {
         return res.status(500).json({
+          message: "Internal Server Error",
+          error,
+        });
+      });
+  };
+
+  findOnePost = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    this.postService
+      .findOnePost(id)
+      .then((data: any) => {
+        res.status(200).json(data);
+      })
+      .catch((error: any) => {
+        res.status(500).json({
           message: "Internal Server Error",
           error,
         });

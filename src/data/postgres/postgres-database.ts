@@ -1,4 +1,7 @@
 import { DataSource } from "typeorm";
+import { User } from "./models/user.model";
+import { Post } from "./models/post.model";
+import { Comment } from "./models/comment.model";
 
 interface Options {
   host: string;
@@ -19,7 +22,7 @@ export class PostgresDatabase {
       username: options.username,
       password: options.password,
       database: options.database,
-      entities: [],
+      entities: [User, Post, Comment],
       synchronize: true,
       ssl: {
         rejectUnauthorized: false,
