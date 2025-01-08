@@ -1,12 +1,17 @@
 import { Request, Response } from "express";
 import { PostService } from "../services/post.service";
+import { CreatePostDTO } from "../../domain";
 
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  createPost = async (req: Request, res: Response) => {
+  createPost = (req: Request, res: Response) => {
+    const [error, createPostDto] = CreatePostDTO.create(req.body);
+
+    if (error) return res.status(422).json({ message: error });
+
     this.postService
-      .createPost(req.body)
+      .createPost(createPostDto!)
       .then((data: any) => {
         return res.status(201).json(data);
       })
@@ -18,7 +23,7 @@ export class PostController {
       });
   };
 
-  findAllPost = async (req: Request, res: Response) => {
+  findAllPost = (req: Request, res: Response) => {
     this.postService
       .findAllPost()
       .then((data) => {
@@ -32,7 +37,7 @@ export class PostController {
       });
   };
 
-  findOnePost = async (req: Request, res: Response) => {
+  findOnePost = (req: Request, res: Response) => {
     const { id } = req.params;
 
     this.postService
@@ -42,7 +47,39 @@ export class PostController {
       })
       .catch((error: any) => {
         res.status(500).json({
-          message: "Internal Server Error",
+          message: "Internal Server Error!!!",
+          error,
+        });
+      });
+  };
+
+  updatePost = (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    this.postService
+      .updatePost(id, req.body)
+      .then((data) => {
+        return res.status(200).json(data);
+      })
+      .catch((error) => {
+        res.status(500).json({
+          message: "Internal Server Error!!!",
+          error,
+        });
+      });
+  };
+
+  deletePost = (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    this.postService
+      .deletePost(id)
+      .then(() => {
+        return res.status(204).json(null);
+      })
+      .catch((error) => {
+        res.status(500).json({
+          message: "Internal Server Error!!!",
           error,
         });
       });
