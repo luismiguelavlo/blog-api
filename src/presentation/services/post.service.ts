@@ -1,5 +1,5 @@
 import { Post } from "../../data";
-import { CreatePostDTO } from "../../domain";
+import { CreatePostDTO, CustomError, UpdatePostDTO } from "../../domain";
 
 export class PostService {
   constructor() {}
@@ -12,7 +12,7 @@ export class PostService {
         },
       });
     } catch (error) {
-      throw new Error("Error obteniendo Post");
+      throw CustomError.internalServer("Error obteniendo datos");
     }
   }
 
@@ -25,7 +25,7 @@ export class PostService {
     });
 
     if (!post) {
-      throw new Error("Post not found");
+      throw CustomError.notFoud("Post not found");
     }
 
     return post;
@@ -40,20 +40,18 @@ export class PostService {
     try {
       return await post.save();
     } catch (error) {
-      throw new Error("Error creando el post");
+      throw CustomError.internalServer("Error creating post");
     }
   }
 
-  async updatePost(id: string, postData: any) {
+  async updatePost(id: string, postData: UpdatePostDTO) {
     const post = await this.findOnePost(id);
-
     post.title = postData.title.toLowerCase().trim();
     post.content = postData.content.trim();
-
     try {
       return await post.save();
     } catch (error) {
-      throw new Error("Error actualizando el post");
+      throw CustomError.internalServer("Error updating post");
     }
   }
 
@@ -65,7 +63,7 @@ export class PostService {
     try {
       post.save();
     } catch (error) {
-      throw new Error("Error al eliminar el post...");
+      throw CustomError.internalServer("Error deleting post");
     }
   }
 }
