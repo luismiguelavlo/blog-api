@@ -1,4 +1,11 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  BaseEntity,
+  BeforeInsert,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { encriptAdapter } from "../../../config";
 
 @Entity()
 export class User extends BaseEntity {
@@ -34,11 +41,18 @@ export class User extends BaseEntity {
   })
   birthdate: Date;
 
-  @Column("varchar")
+  @Column("varchar", {
+    nullable: true,
+  })
   photo: string;
 
   @Column("bool", {
     default: true,
   })
   status: boolean;
+
+  @BeforeInsert()
+  encryptedPassword() {
+    this.password = encriptAdapter.hash(this.password);
+  }
 }
