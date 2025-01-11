@@ -1,4 +1,4 @@
-import { encriptAdapter } from "../../config";
+import { encriptAdapter, envs } from "../../config";
 import { JwtAdapter } from "../../config/jwt.adapter";
 import { Status, User } from "../../data";
 import { CustomError, LoginUserDto, RegisterUserDTO } from "../../domain";
@@ -80,10 +80,10 @@ export class UserService {
   }
 
   public sendEmailValidationLink = async (email: string) => {
-    const token = await JwtAdapter.generateToken({ email });
+    const token = await JwtAdapter.generateToken({ email }, "300s");
     if (!token) throw CustomError.internalServer("Error getting token");
 
-    const link = `http://localhost:3000/api/user/validate-email/${token}`;
+    const link = `http://${envs.WEBSERVICE_URL}/api/user/validate-email/${token}`;
     const html = `
       <h1>Validate your email</h1>
       <p>Click on the following link to validate your email</p>
@@ -97,5 +97,28 @@ export class UserService {
     if (!isSent) throw CustomError.internalServer("Error sending email");
 
     return true;
+  };
+
+  validateEmail = async (token: string) => {
+    const payload = await JwtAdapter.validateToken(token);
+    if (!payload) throw CustomError.badRequest("Invalid Token");
+
+    const { email } = payload as { email: string };
+    if (!email) throw CustomError.internalServer("Email not in token");
+
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) throw CustomError.internalServer("Email not exist");
+
+    user.status = Status.ACTIVE;
+
+    try {
+      await user.save();
+
+      return {
+        message: "Usuario activado",
+      };
+    } catch (error) {
+      throw CustomError.internalServer("Something went very wrong");
+    }
   };
 }

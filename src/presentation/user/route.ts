@@ -19,6 +19,7 @@ export class UserRoutes {
 
     router.post("/login", userController.login);
     router.post("/register", userController.register);
+    router.get("/validate-email/:token", userController.validateAccount);
 
     return router;
   }
