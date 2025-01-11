@@ -1,9 +1,12 @@
 import { encriptAdapter } from "../../config";
 import { JwtAdapter } from "../../config/jwt.adapter";
-import { User } from "../../data";
+import { Status, User } from "../../data";
 import { CustomError, LoginUserDto, RegisterUserDTO } from "../../domain";
+import { EmailService } from "./email.service";
 
 export class UserService {
+  constructor(private readonly emailService: EmailService) {}
+
   async login(credentials: LoginUserDto) {
     //1. buscar el usuario que se quiere loguear
     const user = await this.findUserByEmail(credentials.email);
@@ -43,7 +46,7 @@ export class UserService {
     try {
       const dbUser = await user.save();
 
-      //TODO: enviar link de validacion
+      await this.sendEmailValidationLink(dbUser.email);
 
       return {
         id: dbUser.id,
@@ -67,7 +70,7 @@ export class UserService {
     const user = await User.findOne({
       where: {
         email: email,
-        status: true,
+        status: Status.ACTIVE,
       },
     });
 
@@ -75,4 +78,24 @@ export class UserService {
 
     return user;
   }
+
+  public sendEmailValidationLink = async (email: string) => {
+    const token = await JwtAdapter.generateToken({ email });
+    if (!token) throw CustomError.internalServer("Error getting token");
+
+    const link = `http://localhost:3000/api/user/validate-email/${token}`;
+    const html = `
+      <h1>Validate your email</h1>
+      <p>Click on the following link to validate your email</p>
+      <a href="${link}">Validate your email: ${email}</a>
+    `;
+    const isSent = this.emailService.sendEmail({
+      to: email,
+      subject: "Validate your account",
+      htmlBody: html,
+    });
+    if (!isSent) throw CustomError.internalServer("Error sending email");
+
+    return true;
+  };
 }

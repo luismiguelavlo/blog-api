@@ -7,6 +7,12 @@ import {
 } from "typeorm";
 import { encriptAdapter } from "../../../config";
 
+export enum Status {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  DELETED = "DELETED",
+}
+
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
@@ -46,10 +52,11 @@ export class User extends BaseEntity {
   })
   photo: string;
 
-  @Column("bool", {
-    default: true,
+  @Column("enum", {
+    enum: Status,
+    default: Status.INACTIVE,
   })
-  status: boolean;
+  status: Status;
 
   @BeforeInsert()
   encryptedPassword() {
