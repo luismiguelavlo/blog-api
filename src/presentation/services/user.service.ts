@@ -121,4 +121,19 @@ export class UserService {
       throw CustomError.internalServer("Something went very wrong");
     }
   };
+
+  async getUserProfile(user: User) {
+    return {
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      email: user.email,
+      birthdate: user.birthdate,
+      photo: user.photo,
+    };
+  }
+
+  async blockAccount() {
+    return "hola";
+  }
 }

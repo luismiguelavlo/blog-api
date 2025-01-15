@@ -44,4 +44,18 @@ export class UserController {
       .then((data) => res.status(200).json(data))
       .catch((error) => this.handleError(error, res));
   };
+
+  getProfile = (req: Request, res: Response) => {
+    this.userService
+      .getUserProfile(req.body.sessionUser)
+      .then((data) => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res));
+  };
+
+  blockAccount = (req: Request, res: Response) => {
+    this.userService
+      .blockAccount()
+      .then((data) => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res));
+  };
 }

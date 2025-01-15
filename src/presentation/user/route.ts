@@ -3,6 +3,8 @@ import { UserController } from "./controller";
 import { UserService } from "../services/user.service";
 import { EmailService } from "../services/email.service";
 import { envs } from "../../config";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { UserRole } from "../../data";
 
 export class UserRoutes {
   static get routes(): Router {
@@ -20,6 +22,15 @@ export class UserRoutes {
     router.post("/login", userController.login);
     router.post("/register", userController.register);
     router.get("/validate-email/:token", userController.validateAccount);
+
+    router.use(AuthMiddleware.protect);
+
+    router.get("/profile", userController.getProfile);
+    router.patch(
+      "/block-account/:id",
+      AuthMiddleware.restrictTo(UserRole.ADMIN, UserRole.MODERATOR),
+      userController.blockAccount
+    );
 
     return router;
   }

@@ -13,6 +13,12 @@ export enum Status {
   DELETED = "DELETED",
 }
 
+export enum UserRole {
+  ADMIN = "ADMIN",
+  MODERATOR = "MODERATOR",
+  USER = "USER",
+}
+
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
@@ -51,6 +57,12 @@ export class User extends BaseEntity {
     nullable: true,
   })
   photo: string;
+
+  @Column("enum", {
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  rol: UserRole;
 
   @Column("enum", {
     enum: Status,
